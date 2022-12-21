@@ -1,0 +1,36 @@
+# create a new automation, edit in YAML, paste this code and modify the notify service
+alias: .lock notify
+description: "notify when certain codes are used to unlock the doors, if notify is enabled"
+trigger:
+  - platform: event
+    event_type: zwave_js_notification
+    event_data:
+      command_class: 113
+      command_class_name: Notification
+      label: Access Control
+      type: 6
+      event: 6
+      event_label: Keypad unlock operation
+condition: []
+action:
+  - service: input_text.set_value
+    data:
+      value: "{{trigger.event | replace('>','') | last}}"
+    target:
+      entity_id: input_text.last_lock_unlock_code_slot
+  - choose:
+      - conditions:
+          - condition: template
+            value_template: |2
+                  {% set mysensor = "input_boolean.lock_code_slot_" ~ states('input_text.last_lock_unlock_code_slot') ~ "_notify" %}  
+                  {{is_state(mysensor, 'on') }}
+        sequence:
+          - service: notify.parents # change this to your notify service
+            data:
+              message: >-
+                {% set namesensor = "input_text.lock_code_slot_" ~
+                states('input_text.last_lock_unlock_code_slot') ~ "_name" %} {{
+                states(namesensor)}} unlocked the door via keypad at
+                {{as_timestamp(states.input_text.last_lock_unlock_code_slot.last_changed)
+                | timestamp_custom("%H:%M:%S",local=True)}}
+mode: single
