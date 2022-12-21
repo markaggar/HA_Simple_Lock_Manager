@@ -22,5 +22,5 @@ I suspect that all of this could be converted to blueprints, but I don't have ti
 4) Create the front end YAML by creating a new dashboard in Settings/Dashboards, and editing the page in YAML via raw configuration editor (it is multiple cards) and pasting the code from the lovelace yaml file.
 5) For auto-lock, you can use the auto-lock yaml, but note that it has some custom logic around sensors that prevent the door from auto-locking if it detects activity outside.  You can either replace this with your own sensors or remove these conditions.
 
-#Important Notes
+## Important Notes
 1) The code is set up to support 8 distinct lock codes.  The current code could support 9.  However, it can't support more than that due to the janky ninja template code which assumes that the code slots are only single digits.  If you want more than 9 slots, you will need to fix the template code with something more durable and clever than I am.  By all means feel free to share your code or do Pull Request if you do come up with something better!
