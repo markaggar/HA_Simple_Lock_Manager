@@ -1,4 +1,4 @@
-# HA_Simple_Lock_Manager
+# Home Assistant Simple Lock Manager
 This is a simple simple Zwave Lock Manager for Home Assistant.
 
 When I first migrated from Smartthings to Home Assistant, one of the very first things I needed to do was to figure out how to manage the lock codes on my Zwave (kwikset) locks and have them auto lock.
@@ -9,13 +9,17 @@ There had to be a simpler way, and this is what I developed using a handful of h
 
 The automations support up to 8 distinct codes that can be selectively enabled/disabled and be set to provide a notification if the lock code is used.
 
+I've also included an example auto-lock automation which uses various custom sensors.
+
+I suspect that all of this could be converted to blueprints, but I don't have time for that right now.  Volunteers welcome! :-)
+
 ![image](https://user-images.githubusercontent.com/25288127/208971061-797fa4b9-3915-4080-887a-2de3f22d9b04.png)
 
 # Instructions
-1) Add the sensors in the configuration.yaml file in this repo to your configuration.yaml file (hint use File Editor add-in if possible)
+1) Add the sensors from the configuration.yaml file in this repo to your configuration.yaml file (hint use File Editor add-in if possible)
 2) Reload the input_boolean and input_text helpers via Developer Tools/YAML
-3) Create new automations for each of the set codes and notify yaml files (create new automation and edit in YAML, and then paste the code).  Note there are some modifications you will need to make to use your door lock entities and notification service, but that's it
-4) Create the front end YAML by creating a new dashboard in Settings/Dashboards, and editing the page in YAML (it is multiple cards) and pasting the code from the lovelace yaml file.
+3) Create new automations for each of the 'set codes' and 'notify' yaml files (create new automation and edit in YAML, and then paste the code).  Note there are some modifications you will need to make to use your door lock entities and notification service, but that's it
+4) Create the front end YAML by creating a new dashboard in Settings/Dashboards, and editing the page in YAML via raw configuration editor (it is multiple cards) and pasting the code from the lovelace yaml file.
 5) For auto-lock, you can use the auto-lock yaml, but note that it has some custom logic around sensors that prevent the door from auto-locking if it detects activity outside.  You can either replace this with your own sensors or remove these conditions.
 
 #Important Notes
