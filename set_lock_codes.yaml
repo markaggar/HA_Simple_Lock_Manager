@@ -1,0 +1,88 @@
+#create a new automation, switch to edit in YAML, paste this code, and modify the lock entities
+alias: .locks set codes
+description: set key codes on locks (replacement for keymaster)
+trigger:
+  - platform: state
+    entity_id:
+      - input_text.lock_code_slot_1_pin
+      - input_text.lock_code_slot_2_pin
+      - input_text.lock_code_slot_3_pin
+      - input_text.lock_code_slot_4_pin
+      - input_text.lock_code_slot_5_pin
+      - input_text.lock_code_slot_6_pin
+      - input_text.lock_code_slot_7_pin
+      - input_text.lock_code_slot_8_pin
+    for:
+      hours: 0
+      minutes: 0
+      seconds: 5
+    id: PIN
+  - platform: state
+    entity_id:
+      - input_boolean.lock_code_slot_1_state
+      - input_boolean.lock_code_slot_2_state
+      - input_boolean.lock_code_slot_3_state
+      - input_boolean.lock_code_slot_4_state
+      - input_boolean.lock_code_slot_5_state
+      - input_boolean.lock_code_slot_6_state
+      - input_boolean.lock_code_slot_7_state
+      - input_boolean.lock_code_slot_8_state
+    id: Disable
+    to: "off"
+  - platform: state
+    entity_id:
+      - input_boolean.lock_code_slot_1_state
+      - input_boolean.lock_code_slot_2_state
+      - input_boolean.lock_code_slot_3_state
+      - input_boolean.lock_code_slot_4_state
+      - input_boolean.lock_code_slot_5_state
+      - input_boolean.lock_code_slot_6_state
+      - input_boolean.lock_code_slot_7_state
+      - input_boolean.lock_code_slot_8_state
+    id: PIN
+    to: "on"
+condition: []
+action:
+  - choose:
+      - conditions:
+          - condition: trigger
+            id: PIN
+          - condition: template
+            value_template: >-
+              {% set mysensor = "input_boolean.lock_code_slot_" ~
+              (trigger.entity_id | replace('.','z') | list | sort | first | int)
+              ~ "_state" %}
+
+              {{is_state(mysensor,'on')}} 
+        sequence:
+          - service: zwave_js.set_lock_usercode
+            data:
+              usercode: >-
+                {% set mysensor = "input_text.lock_code_slot_" ~
+                (trigger.entity_id | replace('.','z') | list | sort | first |
+                int) ~ "_PIN" %}   {{states(mysensor)}}
+              code_slot: >-
+                {{trigger.entity_id | replace('.','z') | list | sort | first |
+                int}}
+            target:
+              entity_id:
+                - lock.lock_deck_north_door # change these to your lock entities
+                - lock.lock_front_door
+                - lock.garage_side_door_lock
+            enabled: true
+      - conditions:
+          - condition: trigger
+            id: Disable
+        sequence:
+          - service: zwave_js.clear_lock_usercode
+            data:
+              code_slot: >-
+                {{trigger.entity_id | replace('.','z') | list | sort | first |
+                int}}
+            target:
+              entity_id:
+                - lock.lock_deck_north_door # change these to your lock entities
+                - lock.lock_front_door
+                - lock.garage_side_door_lock
+mode: queued
+max: 10
