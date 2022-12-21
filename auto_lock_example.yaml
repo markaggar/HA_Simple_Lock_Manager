@@ -1,0 +1,104 @@
+# example automation to auto lock doors.  Lots of specific sensors here.  Provided for illustration only
+alias: .auto lock doors
+description: ""
+trigger:
+  - platform: state
+    entity_id:
+      - binary_sensor.sensor_front_door
+      - binary_sensor.sensor_deck_north_doors
+      - binary_sensor.garage_side_door_contact_sensor
+    to: "off"
+    for:
+      hours: 0
+      minutes: 10
+      seconds: 0
+  - platform: time_pattern
+    minutes: /15
+condition: []
+action:
+  - if:
+      - condition: state
+        entity_id: lock.lock_front_door
+        state: unlocked
+      - condition: state
+        entity_id: binary_sensor.frontdoor_is_people
+        state: "off"
+        for:
+          hours: 0
+          minutes: 2
+          seconds: 0
+      - condition: state
+        entity_id: binary_sensor.sensor_front_door
+        state: "off"
+        for:
+          hours: 0
+          minutes: 10
+          seconds: 0
+    then:
+      - service: lock.lock
+        data: {}
+        target:
+          entity_id: lock.lock_front_door
+  - if:
+      - condition: state
+        entity_id: lock.lock_deck_north_door
+        state: unlocked
+      - condition: state
+        entity_id: binary_sensor.deck_is_people
+        state: "off"
+        for:
+          hours: 0
+          minutes: 9
+          seconds: 0
+      - condition: state
+        entity_id: binary_sensor.sensor_deck_north_doors
+        state: "off"
+        for:
+          hours: 0
+          minutes: 10
+          seconds: 0
+    then:
+      - service: lock.lock
+        data: {}
+        target:
+          entity_id:
+            - lock.lock_deck_north_door
+  - if:
+      - condition: state
+        entity_id: lock.garage_side_door_lock
+        state: unlocked
+      - condition: state
+        entity_id: binary_sensor.under_deck_north_is_people
+        state: "off"
+        for:
+          hours: 0
+          minutes: 2
+          seconds: 0
+      - condition: state
+        entity_id: binary_sensor.garage_side_door_contact_sensor
+        state: "off"
+        for:
+          hours: 0
+          minutes: 10
+          seconds: 0
+      - condition: state
+        entity_id: binary_sensor.under_deck_south_is_people
+        state: "off"
+        for:
+          hours: 0
+          minutes: 2
+          seconds: 0
+      - condition: state
+        entity_id: group.garage_motion
+        state: "off"
+        for:
+          hours: 0
+          minutes: 2
+          seconds: 0
+    then:
+      - service: lock.lock
+        data: {}
+        target:
+          entity_id:
+            - lock.garage_side_door_lock
+mode: single
