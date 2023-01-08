@@ -1,0 +1,200 @@
+alias: .doors open for 15 mins or more
+description: ""
+trigger:
+  - platform: state
+    entity_id:
+      - binary_sensor.garage_side_door_contact_sensor
+      - binary_sensor.sensor_front_door
+      - binary_sensor.sensor_family_room_doors
+      - binary_sensor.sensor_deck_north_doors
+      - binary_sensor.sensor_deck_south_doors
+      - binary_sensor.garage_door_tilt_sensor_any
+    to: "on"
+    for:
+      hours: 0
+      minutes: 2
+      seconds: 1
+condition: []
+action:
+  - repeat:
+      while:
+        - condition: template
+          value_template: >-
+            {%- for state in states.binary_sensor if state.entity_id ==
+            trigger.entity_id -%}
+
+            {{state.state == 'on'}}
+
+            {%- endfor -%}
+      sequence:
+        - if:
+            - condition: or
+              conditions:
+                - condition: and
+                  conditions:
+                    - condition: template
+                      value_template: >-
+                        {{trigger.entity_id ==
+                        'binary_sensor.garage_side_door_contact_sensor' or
+                        trigger.entity_id ==
+                        'binary_sensor.garage_door_myq_contact_sensor'}}
+                    - condition: not
+                      conditions:
+                        - condition: state
+                          entity_id: group.garage_motion
+                          state: "off"
+                          for:
+                            hours: 0
+                            minutes: 5
+                            seconds: 0
+                - condition: and
+                  conditions:
+                    - condition: template
+                      value_template: >-
+                        {{trigger.entity_id ==
+                        'binary_sensor.sensor_family_room_doors'}}
+                    - condition: not
+                      conditions:
+                        - condition: state
+                          entity_id: binary_sensor.patio_is_people
+                          state: "off"
+                          for:
+                            hours: 0
+                            minutes: 5
+                            seconds: 0
+                - condition: and
+                  conditions:
+                    - condition: template
+                      value_template: >-
+                        {{trigger.entity_id ==
+                        'binary_sensor.sensor_deck_north_doors' or
+                        trigger.entity_id ==
+                        'binary_sensor.sensor_deck_south_doors'}}
+                    - condition: not
+                      conditions:
+                        - condition: state
+                          entity_id: binary_sensor.deck_is_people
+                          state: "off"
+                          for:
+                            hours: 0
+                            minutes: 5
+                            seconds: 0
+                - condition: and
+                  conditions:
+                    - condition: template
+                      value_template: >-
+                        {{trigger.entity_id ==
+                        'binary_sensor.sensor_front_door'}}
+                    - condition: not
+                      conditions:
+                        - condition: state
+                          entity_id: binary_sensor.frontdoor_is_people
+                          state: "off"
+                          for:
+                            hours: 0
+                            minutes: 5
+                            seconds: 0
+                - condition: and
+                  conditions:
+                    - condition: template
+                      value_template: >-
+                        {{trigger.entity_id ==
+                        'binary_sensor.garage_door_tilt_sensor_any'}}
+                    - condition: not
+                      conditions:
+                        - condition: state
+                          entity_id: binary_sensor.garage_door_tilt_sensor_any
+                          state: "on"
+                          for:
+                            hours: 0
+                            minutes: 10
+                            seconds: 0
+          then:
+            - wait_template: >-
+                {%- for state in states.binary_sensor if state.entity_id ==
+                trigger.entity_id -%}
+
+                {{state.state == 'off'}}
+
+                {%- endfor -%}
+              continue_on_timeout: true
+              timeout: "00:01:00"
+          else:
+            - service: notify.mark
+              data_template:
+                message: >-
+                  {%set DoorLastChangedTS-%} {%-for state in
+                  states.binary_sensor if state.entity_id ==
+                  trigger.entity_id-%} {{((as_timestamp(now()) | int -
+                  as_timestamp(state.last_changed) | int) /60 ) | round | int }}
+                  minutes  {%-endfor-%} {%-endset-%} {%- for state in
+                  states.binary_sensor if state.entity_id == trigger.entity_id
+                  -%}
+                    {{ state.attributes.friendly_name | replace(" Contact Sensor","") | replace(" Tilt Sensor","") }} has been open for {{DoorLastChangedTS}}
+                  {%- endfor -%}
+              enabled: false
+            - service: notify.alexa_media_kitchen_echo_show
+              data_template:
+                message: >-
+                  {%set DoorLastChangedTS-%} {%-for state in
+                  states.binary_sensor if state.entity_id ==
+                  trigger.entity_id-%} {{((as_timestamp(now()) | int -
+                  as_timestamp(state.last_changed) | int) /60 ) | round | int }}
+                  minutes  {%-endfor-%} {%-endset-%} {%- for state in
+                  states.binary_sensor if state.entity_id == trigger.entity_id
+                  -%}
+                    {{ state.attributes.friendly_name | replace(" Contact Sensor","") | replace(" Tilt Sensor","") }} has been open for {{DoorLastChangedTS}}
+                  {%- endfor -%}
+                data:
+                  type: announce
+              enabled: false
+            - event: UserNotify
+              event_data_template:
+                data:
+                  message: >-
+                    {%set DoorLastChangedTS-%} {%-for state in
+                    states.binary_sensor if state.entity_id ==
+                    trigger.entity_id-%} {{((as_timestamp(now()) | int -
+                    as_timestamp(state.last_changed) | int) /60 ) | round | int
+                    }} minutes  {%-endfor-%} {%-endset-%} {%- for state in
+                    states.binary_sensor if state.entity_id == trigger.entity_id
+                    -%} {{ state.attributes.friendly_name | replace(" Contact
+                    Sensor","") | replace(" Tilt Sensor","") }} has been open
+                    for {{DoorLastChangedTS}} at {{now().strftime('%H:%m')}} 
+                    {%- endfor -%}
+                  message_speak: >-
+                    {%set DoorLastChangedTS-%} {%-for state in
+                    states.binary_sensor if state.entity_id ==
+                    trigger.entity_id-%} {{((as_timestamp(now()) | int -
+                    as_timestamp(state.last_changed) | int) /60 ) | round | int
+                    }} minutes  {%-endfor-%} {%-endset-%} {%- for state in
+                    states.binary_sensor if state.entity_id == trigger.entity_id
+                    -%} {{ state.attributes.friendly_name | replace(" Contact
+                    Sensor","") | replace(" Tilt Sensor","") }} has been open
+                    for {{DoorLastChangedTS}} {%- endfor -%}
+                  title: Door left open
+                  tag: |-
+                    {%- for state in states.binary_sensor if
+                     state.entity_id == trigger.entity_id -%} {{state.attributes.friendly_name
+                     | replace(" Contact Sensor","") | replace(" Tilt Sensor","")}} Open{%- endfor -%}
+                  priority: normal
+                  channel: General
+            - wait_template: >-
+                {%- for state in states.binary_sensor if state.entity_id ==
+                trigger.entity_id -%}
+
+                {{state.state == 'off'}}
+
+                {%- endfor -%}
+              continue_on_timeout: true
+              timeout: "00:05:00"
+  - event: UserNotify
+    event_data_template:
+      data:
+        message: clear_notification
+        tag: |-
+          {%- for state in states.binary_sensor if
+           state.entity_id == trigger.entity_id -%} {{state.attributes.friendly_name
+           | replace(" Contact Sensor","") | replace(" Tilt Sensor","")}} Open{%- endfor -%}
+mode: parallel
+max: 10
