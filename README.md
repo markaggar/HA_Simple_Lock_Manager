@@ -1,5 +1,5 @@
-# Home Assistant Simple Lock Manager
-This is a simple Zwave Lock Manager for Home Assistant.
+# Home Assistant Simple Lock and Door Manager
+This is a simple Zwave Lock and Door Manager for Home Assistant.
 
 When I first migrated from Smartthings to Home Assistant, one of the very first things I needed to do was to figure out how to manage the lock codes on my Zwave (Kwikset) locks and have them auto lock.
 
