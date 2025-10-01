@@ -49,7 +49,7 @@ input_boolean:
     name: Lock Code Slot 8 Notify
     icon: mdi:alarm-bell
   lock_code_slot_9_state:
-    name: Lock Code Slot 8 State
+    name: Lock Code Slot 9 State
     icon: mdi:lock-check    
   lock_code_slot_9_notify:
     name: Lock Code Slot 9 Notify
