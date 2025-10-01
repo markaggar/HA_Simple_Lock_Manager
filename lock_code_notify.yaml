@@ -1,9 +1,8 @@
 # create a new automation, edit in YAML, paste this code and modify the notify service
 alias: .lock notify
-description: "notify when certain codes are used to unlock the doors, if notify is enabled"
-trigger:
-  - platform: event
-    event_type: zwave_js_notification
+description: notify when certain codes are used to unlock the doors, if notify is enabled
+triggers:
+  - event_type: zwave_js_notification
     event_data:
       command_class: 113
       command_class_name: Notification
@@ -11,26 +10,26 @@ trigger:
       type: 6
       event: 6
       event_label: Keypad unlock operation
-condition: []
-action:
-  - service: input_text.set_value
-    data:
-      value: "{{trigger.event | replace('>','') | last}}"
-    target:
-      entity_id: input_text.last_lock_unlock_code_slot
+    trigger: event
+conditions: []
+actions:
+  - variables:
+      user_code: "{{ trigger.event.data.parameters.userId }}"
+      user_name: >-
+        {{ states('input_text.lock_code_slot_' ~
+        trigger.event.data.parameters.userId ~ '_name') }}
   - choose:
       - conditions:
           - condition: template
-            value_template: |2
-                  {% set mysensor = "input_boolean.lock_code_slot_" ~ states('input_text.last_lock_unlock_code_slot') ~ "_notify" %}  
-                  {{is_state(mysensor, 'on') }}
+            value_template: >-
+              {{ is_state('input_boolean.lock_code_slot_' ~ user_code ~
+              '_notify', 'on') }}
         sequence:
-          - service: notify.parents # change this to your notify service
-            data:
+          - event: UNotify
+            event_data:
               message: >-
-                {% set namesensor = "input_text.lock_code_slot_" ~
-                states('input_text.last_lock_unlock_code_slot') ~ "_name" %} {{
-                states(namesensor)}} unlocked the door via keypad at
-                {{as_timestamp(states.input_text.last_lock_unlock_code_slot.last_changed)
-                | timestamp_custom("%H:%M:%S",local=True)}}
+                {{ user_name }} unlocked the door via keypad at {{
+                now().strftime('%H:%M:%S') }}
+              message_target: parents
+              tag: doorunlocked
 mode: single
