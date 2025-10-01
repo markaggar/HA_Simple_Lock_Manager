@@ -1,27 +1,80 @@
 # Home Assistant Simple Lock and Door Manager
+
 This is a simple Zwave Lock and Door Manager for Home Assistant.
 
-When I first migrated from Smartthings to Home Assistant, one of the very first things I needed to do was to figure out how to manage the lock codes on my Zwave (Kwikset) locks and have them auto lock.
+When I first migrated from Smartthings to Home Assistant, one of the very first things I needed to do was to figure out how to manage the lock codes on my Zwave (Kwikset) locks and have them auto lock after a period of time based on various door/motion sensors.
 
-I discovered the KeyMaster integration and went with it.  However, it was more complex than I needed and most of all it made my install messy with the hundreds of helpers it created that HA would report as broken and were unfixable. 
+I discovered the KeyMaster integration and went with it. However, it was more complex than I needed and most of all it made my install messy with the hundreds of helpers it created that HA would report as restored entities every time I restarted HA. I wanted something simpler.
 
-There had to be a simpler way, and this is what I developed using a handful of helpers and a few automations with very little customization needed.  The key difference is that it doesn't support scheduling (although you could easily write a distinct automation to enable disable the appropriate booleans at certain times) and most importantly it doesn't make a distinction between various locks you might have.  Basically, if you can get in the house via one lock, you can get in the house via all the locks.  
+There had to be a simpler way, and this is what I developed using a handful of helpers and a few automations with very little customization needed. The key difference is that it doesn't support scheduling. There's one big automation that handles all 8 codes. Everything is simpler. The user experience is essentially the same as KeyMaster but far simpler to set up and maintain.
 
-The automations support up to 8 distinct codes that can be selectively enabled/disabled and be set to provide a notification if the lock code is used.
+The automations support up to 9 distinct codes that can be selectively enabled/disabled and be set to provide a notification if the lock code is used.
 
-I've also included an example auto-lock automation which uses various custom sensors.
-
-I suspect that all of this could be converted to blueprints, but I don't have time for that right now.  Volunteers welcome! :-)
+I've also included example automations for auto-lock functionality and door open notifications.
 
 ![image](https://user-images.githubusercontent.com/25288127/208971061-797fa4b9-3915-4080-887a-2de3f22d9b04.png)
 
-# Instructions
-1) Add the sensors from the configuration.yaml file in this repo to your configuration.yaml file (hint use File Editor add-in if possible)
-2) Reload the input_boolean and input_text helpers via Developer Tools/YAML
-3) Create new automations for each of the 'set codes' and 'notify' yaml files (create new automation and edit in YAML, and then paste the code).  Note there are some modifications you will need to make to use your door lock entities and notification service, but that's it
-4) Create the front end YAML by creating a new dashboard in Settings/Dashboards, and editing the page in YAML via raw configuration editor (it is multiple cards) and pasting the code from the lovelace yaml file.
-5) For auto-lock, you can use the auto-lock yaml and replace your lock and door contact sensor entities, but note that it has some custom logic around sensors that prevent the door from auto-locking if it detects activity outside.  You can either replace this with your own sensors or remove these conditions.
-6) For getting notifications for doors that are open for more than a certain amount of time, create an automation using the doors_open_notify_automation.yaml file.  Update the binary_sensors (contact sensors) that you want notifications about.  Note that the notification uses a specific service (UserNotify) that is custom to my automation, so there are a couple of disabled actions in the file which you can use to notify using regular mobile push notifications.  The conditions in the first part of the automation allow for customization per door - namely the length of time a door needs to be open before you start receiving notifications, and motion sensors that need to be idle for a period of time before a door will get notifications.  I use this for areas like the deck and garage where the doors are often open for long periods when we are outside.
+## Installation
+
+1. **Download the package file**: Download `Simple_Lock_Manager_Package.yaml` from this repository
+2. **Create packages directory**: If you don't already have one, create a `packages` directory in your Home Assistant configuration directory
+3. **Copy the package**: Place `Simple_Lock_Manager_Package.yaml` in your `packages` directory
+4. **Enable packages in configuration.yaml**: Add the following to your `configuration.yaml` if not already present:
+   ```yaml
+   homeassistant:
+     packages: !include_dir_named packages
+   ```
+5. **Customize lock entities**: Edit the `Simple_Lock_Manager_Package.yaml` file and replace the example lock entities with your actual lock entity IDs:
+   - `lock.lock_deck_north_door`
+   - `lock.lock_front_door` 
+   - `lock.garage_side_door_lock`
+6. **Customize notification service**: In the lock notification automation, update the notification service and targets as needed
+7. **Reload YAML**: Go to Developer Tools/YAML and Reload all YAML to create the entities/automations
+8. **Create dashboard**: Create a new dashboard using the Lovelace configuration from `lockcodes_lovelace.yaml`
+
+### Additional Optional Automations
+
+The repository also includes example automations that you can customize for your setup:
+
+- **Auto-lock**: `auto_lock_example.yaml` - Automatically locks doors based on door sensors and motion detection
+- **Door open notifications**: `doors_open_notify_automation.yaml` - Alerts when doors are left open too long
+
+## Configuration Requirements
+
+### Required Customizations
+
+1. **Lock Entities**: Update all lock entity references to match your actual lock entities
+2. **Notification Services**: Configure notification services in the lock notify automation
+3. **Sensor Entities**: For optional automations, update sensor entity references to match your setup
+
+### Entity Structure
+
+The package creates the following entities for each of the 9 lock code slots:
+
+- `input_text.lock_code_slot_X_pin` - The PIN code (5-10 digits)
+- `input_text.lock_code_slot_X_name` - Name/description for the code
+- `input_boolean.lock_code_slot_X_state` - Enable/disable the code
+- `input_boolean.lock_code_slot_X_notify` - Enable/disable notifications for this code
+
+## Dashboard Configuration
+
+Create a new dashboard and use the raw configuration editor to add the cards from `lockcodes_lovelace.yaml`. You'll need to update the user visibility settings to match your Home Assistant users.
 
 ## Important Notes
-1) The code is set up to support 8 distinct lock codes.  The current code could support 9.  However, it can't support more than that due to the janky ninja template code which assumes that the code slots are only single digits.  If you want more than 9 slots, you will need to fix the template code with something more durable and clever than I am.  By all means feel free to share your code or do Pull Request if you do come up with something better!
+
+1. The code supports up to 9 distinct lock codes
+2. The system uses Z-Wave JS for lock code management  
+3. PIN codes must be 5-10 digits and numeric only
+4. The notification system can be customized to use any Home Assistant notification service
+5. For production use, customize all entity references, sensor names, and notification services (i.e. any hardcoded entity and notification service names to match your setup).
+
+## Troubleshooting
+
+- Ensure your locks are properly integrated with Z-Wave JS
+- Verify entity IDs match your actual lock entities
+- Check that the packages directory is properly configured in configuration.yaml
+- Use Developer Tools to test automation triggers and actions
+
+## Contributing
+
+Feel free to submit issues, feature requests, or pull requests.
