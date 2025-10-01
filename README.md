@@ -12,7 +12,7 @@ The automations support up to 9 distinct codes that can be selectively enabled/d
 
 I've also included example automations for auto-lock functionality and door open notifications.
 
-![image](https://user-images.githubusercontent.com/25288127/208971061-797fa4b9-3915-4080-887a-2de3f22d9b04.png)
+<img width="1347" height="899" alt="image" src="https://github.com/user-attachments/assets/bd831df6-59ed-4b24-ba60-67b2da9c9610" />
 
 ## Installation
 
