@@ -48,7 +48,10 @@ input_boolean:
   lock_code_slot_8_notify:
     name: Lock Code Slot 8 Notify
     icon: mdi:alarm-bell     
-
+  lock_code_slot_9_notify:
+    name: Lock Code Slot 9 Notify
+    icon: mdi:alarm-bell
+    
 input_text:
   lock_code_slot_1_pin:
     name: Lock Code Slot 1 PIN
@@ -122,3 +125,12 @@ input_text:
   lock_code_slot_8_name:
     name: Lock Code Slot 8 Name
     icon: mdi:account
+  lock_code_slot_9_pin:
+    name: Lock Code Slot 8 PIN
+    min: 5
+    max: 10
+    pattern: "[0-9]*"
+    icon: mdi:form-textbox-password 
+  lock_code_slot_9_name:
+    name: Lock Code Slot 8 Name
+    icon: mdi:account    
