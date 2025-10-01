@@ -12,6 +12,7 @@ trigger:
       - input_text.lock_code_slot_6_pin
       - input_text.lock_code_slot_7_pin
       - input_text.lock_code_slot_8_pin
+      - input_text.lock_code_slot_9_pin      
     for:
       hours: 0
       minutes: 0
@@ -27,6 +28,7 @@ trigger:
       - input_boolean.lock_code_slot_6_state
       - input_boolean.lock_code_slot_7_state
       - input_boolean.lock_code_slot_8_state
+      - input_boolean.lock_code_slot_9_state      
     id: Disable
     to: "off"
   - platform: state
@@ -39,6 +41,7 @@ trigger:
       - input_boolean.lock_code_slot_6_state
       - input_boolean.lock_code_slot_7_state
       - input_boolean.lock_code_slot_8_state
+      - input_boolean.lock_code_slot_9_state      
     id: PIN
     to: "on"
 condition: []
