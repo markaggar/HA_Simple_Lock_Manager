@@ -16,7 +16,7 @@ I've also included example automations for auto-lock functionality and door open
 
 ## Installation
 
-1. **Download the package file**: Download `Simple_Lock_Manager_Package.yaml` from this repository
+1. **Download the package file**: Download `simple_lock_manager_package.yaml` from this repository
 2. **Create packages directory**: If you don't already have one, create a `packages` directory in your Home Assistant configuration directory
 3. **Copy the package**: Place `Simple_Lock_Manager_Package.yaml` in your `packages` directory
 4. **Enable packages in configuration.yaml**: Add the following to your `configuration.yaml` if not already present:
@@ -30,7 +30,7 @@ I've also included example automations for auto-lock functionality and door open
    - `lock.garage_side_door_lock`
 6. **Customize notification service**: In the lock notification automation, update the notification service and targets as needed
 7. **Reload YAML**: Go to Developer Tools/YAML and Reload all YAML to create the entities/automations
-8. **Create dashboard**: Create a new dashboard using the Lovelace configuration from `lockcodes_lovelace.yaml`
+8. **Create dashboard**: Create a new dashboard using the Dashboard configuration from `lockcodes_lovelace.yaml`
 
 ### Additional Optional Automations
 
