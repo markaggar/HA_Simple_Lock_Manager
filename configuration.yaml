@@ -47,7 +47,10 @@ input_boolean:
     icon: mdi:lock-check
   lock_code_slot_8_notify:
     name: Lock Code Slot 8 Notify
-    icon: mdi:alarm-bell     
+    icon: mdi:alarm-bell
+  lock_code_slot_9_state:
+    name: Lock Code Slot 8 State
+    icon: mdi:lock-check    
   lock_code_slot_9_notify:
     name: Lock Code Slot 9 Notify
     icon: mdi:alarm-bell
