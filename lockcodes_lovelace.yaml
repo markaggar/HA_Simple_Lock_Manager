@@ -153,5 +153,23 @@ views:
                 name: Enabled
               - entity: input_boolean.lock_code_slot_8_notify
                 name: Notify
+      - type: vertical-stack
+        cards:
+          - content: |
+              ## Code 9
+            type: markdown
+          - type: entities
+            show_header_toggle: false
+            entities:
+              - entity: input_text.lock_code_slot_9_name
+                secondary_info: none
+                name: Name
+              - entity: input_text.lock_code_slot_9_pin
+                name: Code
+              - type: divider
+              - entity: input_boolean.lock_code_slot_9_state
+                name: Enabled
+              - entity: input_boolean.lock_code_slot_9_notify
+                name: Notify                
 title: Doors and Locks
   
